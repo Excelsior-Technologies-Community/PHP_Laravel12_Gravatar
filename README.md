@@ -1,59 +1,535 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# PHP_Laravel12_Gravatar
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
 
-## About Laravel
+## Project Description
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+PHP_Laravel12_Gravatar is a simple Laravel 12 application that demonstrates how to generate Gravatar profile images from email addresses and store them in a database.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+The application allows users to enter an email address, automatically generate the corresponding Gravatar avatar using an MD5 hash, and display the avatar on the page. Each generated avatar is also saved in the database and displayed in a list for reference.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+This project is useful for learning how to integrate Gravatar services in Laravel applications, work with controllers, models, migrations, and Blade views, and manage user data using Eloquent ORM.
 
-## Learning Laravel
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+## Features
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+- Generate Gravatar avatar from email address
 
-## Laravel Sponsors
+- Convert email to MD5 hash for Gravatar API
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+- Display Gravatar profile image dynamically
 
-### Premium Partners
+- Store generated avatars in the database
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+- List previously generated avatars
 
-## Contributing
+- Clean and responsive user interface
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+- Simple Laravel MVC architecture
 
-## Code of Conduct
+- Uses Eloquent ORM for database operations
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
 
-## Security Vulnerabilities
+## Technologies Used
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+- PHP 8+
 
-## License
+- Laravel 12
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+- MySQL Database
+
+- Blade Template Engine
+
+- Gravatar API
+
+- HTML5
+
+- CSS3
+
+- Composer
+
+
+---
+
+
+
+## Installation Steps
+
+
+---
+
+
+## STEP 1: Create Laravel 12 Project
+
+### Open terminal / CMD and run:
+
+```
+composer create-project laravel/laravel PHP_Laravel12_Gravatar "12.*"
+
+```
+
+### Go inside project:
+
+```
+cd PHP_Laravel12_Gravatar
+
+```
+
+#### Explanation:
+
+This command installs a fresh Laravel 12 application and creates the project folder.
+
+The cd command moves into the newly created project directory.
+
+
+
+
+## STEP 2: Database Setup 
+
+### Update database details:
+
+```
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=laravel12_Gravatar
+DB_USERNAME=root
+DB_PASSWORD=
+
+```
+
+### Create database in MySQL / phpMyAdmin:
+
+```
+Database name: laravel12_gravatar
+
+```
+
+### Then Run:
+
+```
+php artisan migrate
+
+```
+
+
+#### Explanation:
+
+This step connects Laravel with the MySQL database.
+
+The migration command creates the default Laravel tables in the database.
+
+
+
+
+## STEP 3: Install Gravatar Package 
+
+### Install the package:
+
+```
+composer require creativeorange/gravatar
+
+```
+
+#### Explanation
+
+This package helps generate Gravatar profile images from email addresses easily inside Laravel.
+
+
+
+
+
+## STEP 4: Publish Configuration (Optional)
+
+### Run:
+
+```
+php artisan vendor:publish
+
+```
+
+### It will create
+
+```
+config/gravatar.php
+
+```
+
+### Example config:
+
+```
+return [
+
+    'default' => 'mp',
+
+    'size' => 80,
+
+    'rating' => 'g',
+
+    'secure' => true,
+
+];
+
+```
+
+#### Explanation
+
+This step publishes the Gravatar configuration file, allowing you to customize avatar size, default image, and rating settings.
+
+
+
+
+## STEP 5: Create Model + Migration
+
+### Run command:
+
+```
+php artisan make:model Gravatar -m
+
+```
+
+### This creates:
+
+```
+app/Models/Gravatar.php
+database/migrations/xxxx_create_gravatars_table.php
+
+```
+
+
+### Open migration file: database/migrations/xxxx_create_gravatars_table.php
+
+```
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration {
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('gravatars', function (Blueprint $table) {
+            $table->id();
+            $table->string('email');
+            $table->string('avatar');
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('gravatars');
+    }
+};
+
+
+```
+
+
+### Then Run:
+
+```
+php artisan migrate
+
+```
+
+
+### Open File: app/Models/Gravatar.php
+
+```
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Gravatar extends Model
+{
+    protected $fillable = [
+        'email',
+        'avatar'
+    ];
+}
+
+```
+
+#### Explanation
+
+This command creates a Model for database interaction and a Migration file to create the gravatars table.
+
+The migration creates a database table to store email addresses and their corresponding Gravatar URLs.
+
+
+
+
+
+
+## STEP 6: Create Controller
+
+### Run:
+
+```
+php artisan make:controller GravatarController
+
+```
+
+### File: app/Http/Controllers/GravatarController.php
+
+```
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use App\Models\Gravatar;
+
+class GravatarController extends Controller
+{
+
+    public function index()
+    {
+        $avatars = Gravatar::latest()->get();
+        return view('gravatar', compact('avatars'));
+    }
+
+    public function generate(Request $request)
+    {
+        $email = strtolower(trim($request->email));
+
+        $hash = md5($email);
+
+        $avatar = "https://www.gravatar.com/avatar/".$hash."?s=200&d=identicon";
+
+        Gravatar::create([
+            'email'=>$email,
+            'avatar'=>$avatar
+        ]);
+
+        return redirect('/');
+    }
+}
+
+```
+
+#### Explanation
+
+The controller handles the application logic, such as receiving the email, generating the Gravatar URL, and saving it to the database.
+
+
+
+
+
+
+## STEP 7: Create Routes
+
+### File: routes/web.php
+
+```
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\GravatarController;
+
+Route::get('/', [GravatarController::class,'index']);
+
+Route::post('/generate',[GravatarController::class,'generate'])->name('generate.avatar');
+
+```
+
+#### Explanation
+
+Routes define URLs that users can access and connect them to controller methods.
+
+
+
+
+
+## STEP 8: Create View
+
+### Create file: resources/views/gravatar.blade.php
+
+```
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Laravel 12 Gravatar</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            background: #f3f4f6;
+            display: flex;
+            justify-content: center;
+            padding-top: 50px;
+        }
+
+        .container {
+            width: 500px;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            margin-top: 10px;
+            padding: 10px;
+            background: #6366f1;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            width: 100%;
+        }
+
+        .avatar {
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border-bottom: 1px solid #eee;
+            padding: 10px 0;
+        }
+
+        .avatar img {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h2>Laravel 12 Gravatar Generator</h2>
+
+        <form method="POST" action="{{ route('generate.avatar') }}">
+            @csrf
+
+            <input type="email" name="email" placeholder="Enter Email">
+
+            <button>Generate Avatar</button>
+
+        </form>
+
+        <hr style="margin:20px 0;">
+
+        <h3>Saved Avatars</h3>
+
+        @foreach($avatars as $avatar)
+
+            <div class="avatar">
+
+                <img src="{{ $avatar->avatar }}">
+
+                <div>
+
+                    <b>{{ $avatar->email }}</b>
+
+                </div>
+
+            </div>
+
+        @endforeach
+
+    </div>
+
+</body>
+
+</html>
+
+```
+
+#### Explanation
+
+This Blade template provides the user interface, including the email input form and the list of generated avatars.
+
+
+
+
+
+## STEP 9: Run Project
+
+### Run:
+
+```
+php artisan serve
+
+```
+
+### Open
+
+```
+http://127.0.0.1:8000
+
+```
+
+#### Explanation
+
+This command starts Laravel's local development server, allowing you to access the application in your browser.
+
+
+
+
+## Expected Output:
+
+
+### Main Page:
+
+
+<img width="1919" height="936" alt="Screenshot 2026-03-05 165535" src="https://github.com/user-attachments/assets/52246c94-62c1-40eb-bb6b-80cd58ee8b7f" />
+
+
+### Generated Avatar:
+
+
+<img width="1919" height="947" alt="Screenshot 2026-03-05 173923" src="https://github.com/user-attachments/assets/e8e97d1f-7426-45b8-baa4-91e5068c5c1d" />
+
+
+---
+
+# Project Folder Structure:
+
+```
+PHP_Laravel12_Gravatar
+│
+├── app
+│   ├── Http
+│   │   └── Controllers
+│   │       └── GravatarController.php
+│   │
+│   ├── Models
+│   │   └── Gravatar.php
+│
+├── database
+│   └── migrations
+│       └── xxxx_create_gravatars_table.php
+│
+├── resources
+│   └── views
+│       └── gravatar.blade.php
+│
+├── routes
+│   └── web.php
+│
+├── .env
+├── artisan
+├── composer.json
+
+```
