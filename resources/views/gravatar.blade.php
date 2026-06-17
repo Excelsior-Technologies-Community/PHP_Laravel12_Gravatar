@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Gravatar Generator</title>
-    
+
     <style>
         * {
             margin: 0;
@@ -26,7 +26,6 @@
             margin: 0 auto;
         }
 
-        /* Card Style */
         .card {
             background: white;
             border-radius: 16px;
@@ -35,7 +34,6 @@
             margin-bottom: 24px;
         }
 
-        /* Header */
         .header {
             text-align: center;
             margin-bottom: 30px;
@@ -53,7 +51,6 @@
             font-size: 14px;
         }
 
-        /* Form Elements */
         .form-group {
             margin-bottom: 18px;
         }
@@ -127,7 +124,6 @@
             font-size: 12px;
         }
 
-        /* Messages */
         .alert {
             padding: 12px 16px;
             border-radius: 12px;
@@ -147,7 +143,6 @@
             border: 1px solid #fecaca;
         }
 
-        /* Search */
         .search-box {
             margin-bottom: 20px;
         }
@@ -156,7 +151,37 @@
             background: #f9fafb;
         }
 
-        /* Avatar List */
+        .stats-bar {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            background: #f9fafb;
+            border-radius: 12px;
+            padding: 14px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            flex: 1;
+            text-align: center;
+            min-width: 80px;
+        }
+
+        .stat-num {
+            display: block;
+            font-size: 20px;
+            font-weight: 700;
+            color: #3b82f6;
+        }
+
+        .stat-label {
+            display: block;
+            font-size: 11px;
+            color: #6b7280;
+            margin-top: 2px;
+        }
+
         .avatar-list {
             margin-top: 16px;
         }
@@ -170,6 +195,8 @@
             border-radius: 12px;
             margin-bottom: 8px;
             transition: all 0.2s;
+            flex-wrap: wrap;
+            gap: 10px;
         }
 
         .avatar-item:hover {
@@ -205,9 +232,10 @@
         .avatar-actions {
             display: flex;
             gap: 8px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
         }
 
-        /* Preview Box */
         .preview-box {
             display: flex;
             align-items: center;
@@ -241,7 +269,6 @@
             margin-top: 2px;
         }
 
-        /* Action Bar */
         .action-bar {
             display: flex;
             gap: 12px;
@@ -249,7 +276,6 @@
             flex-wrap: wrap;
         }
 
-        /* Divider */
         hr {
             margin: 20px 0;
             border: none;
@@ -285,7 +311,6 @@
             margin-left: 8px;
         }
 
-        /* Modal */
         .modal {
             display: none;
             position: fixed;
@@ -310,6 +335,8 @@
             max-width: 380px;
             width: 90%;
             text-align: center;
+            max-height: 85vh;
+            overflow-y: auto;
         }
 
         .modal-content h3 {
@@ -327,9 +354,9 @@
             display: flex;
             gap: 10px;
             justify-content: center;
+            margin-top: 16px;
         }
 
-        /* Row */
         .row {
             display: flex;
             gap: 12px;
@@ -339,7 +366,33 @@
             flex: 1;
         }
 
-        /* Responsive */
+        .pagination-wrap {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            margin-top: 20px;
+        }
+
+        .page-btn {
+            padding: 6px 14px;
+            border-radius: 8px;
+            background: #f3f4f6;
+            color: #374151;
+            text-decoration: none;
+            font-size: 13px;
+        }
+
+        .page-btn.disabled {
+            opacity: 0.4;
+            pointer-events: none;
+        }
+
+        .page-info {
+            font-size: 13px;
+            color: #6b7280;
+        }
+
         @media (max-width: 600px) {
             body {
                 padding: 20px 16px;
@@ -355,6 +408,9 @@
             .avatar-info {
                 flex-direction: column;
             }
+            .avatar-actions {
+                justify-content: center;
+            }
             .row {
                 flex-direction: column;
             }
@@ -367,15 +423,11 @@
 <body>
 
 <div class="container">
-    <!-- Header -->
     <div class="header">
         <h1>Gravatar Generator</h1>
-       
     </div>
 
-    <!-- Main Card -->
     <div class="card">
-        <!-- Messages -->
         @if(session('success'))
             <div class="alert alert-success">✓ {{ session('success') }}</div>
         @endif
@@ -383,10 +435,44 @@
             <div class="alert alert-error">✗ {{ session('error') }}</div>
         @endif
 
-        <!-- Search -->
+        <div class="stats-bar">
+            <div class="stat-item">
+                <span class="stat-num" id="statTotal">-</span>
+                <span class="stat-label">Total</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-num" id="statReal">-</span>
+                <span class="stat-label">Real Photos</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-num" id="statFavorites">-</span>
+                <span class="stat-label">Favorites</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-num" id="statRecent">-</span>
+                <span class="stat-label">This Week</span>
+            </div>
+        </div>
+
         <div class="search-box">
             <form method="GET" action="/">
-                <input type="text" name="search" placeholder=" Search by email..." value="{{ request('search') }}">
+                <div class="row">
+                    <div style="flex:2;">
+                        <input type="text" name="search" placeholder="Search by email..." value="{{ request('search') }}">
+                    </div>
+                    <div>
+                        <select name="sort" onchange="this.form.submit()">
+                            <option value="latest" {{ ($sort ?? 'latest') == 'latest' ? 'selected' : '' }}>Newest First</option>
+                            <option value="oldest" {{ ($sort ?? '') == 'oldest' ? 'selected' : '' }}>Oldest First</option>
+                            <option value="email_asc" {{ ($sort ?? '') == 'email_asc' ? 'selected' : '' }}>Email A-Z</option>
+                            <option value="email_desc" {{ ($sort ?? '') == 'email_desc' ? 'selected' : '' }}>Email Z-A</option>
+                            <option value="favorites" {{ ($sort ?? '') == 'favorites' ? 'selected' : '' }}>Favorites First</option>
+                        </select>
+                    </div>
+                    <div>
+                        <button type="submit">Search</button>
+                    </div>
+                </div>
             </form>
         </div>
 
@@ -397,30 +483,47 @@
             </p>
         @endif
 
-        <!-- Single Generate Form -->
-        <div class="section-title">
-             Generate Avatar
-        </div>
+        <div class="section-title">Generate Avatar</div>
         <form method="POST" action="{{ route('generate.avatar') }}" id="singleForm">
             @csrf
             <div class="row">
-                <div style="flex: 2;">
+                <div style="flex: 3;">
                     <input type="email" name="email" id="emailInput" placeholder="Enter email address" required>
                 </div>
                 <div>
-                    <select name="size">
+                    <button type="submit">Generate</button>
+                </div>
+            </div>
+            <div class="row" style="margin-top: 10px;">
+                <div>
+                    <select name="size" id="sizeSelect">
                         <option value="80">80px</option>
                         <option value="200" selected>200px</option>
                         <option value="300">300px</option>
                     </select>
                 </div>
                 <div>
-                    <button type="submit">Generate</button>
+                    <select name="rating" id="ratingSelect">
+                        <option value="g" selected>G - General</option>
+                        <option value="pg">PG - Parental Guidance</option>
+                        <option value="r">R - Restricted</option>
+                        <option value="x">X - Explicit</option>
+                    </select>
+                </div>
+                <div>
+                    <select name="default_image" id="defaultImageSelect">
+                        <option value="identicon" selected>Identicon</option>
+                        <option value="monsterid">MonsterID</option>
+                        <option value="wavatar">Wavatar</option>
+                        <option value="retro">Retro</option>
+                        <option value="robohash">RoboHash</option>
+                        <option value="mp">Mystery Person</option>
+                        <option value="blank">Blank</option>
+                    </select>
                 </div>
             </div>
         </form>
 
-        <!-- Live Preview -->
         <div id="previewBox" class="preview-box" style="display: none;">
             <img id="previewImg" src="" alt="Preview">
             <div class="preview-info">
@@ -432,19 +535,37 @@
 
         <hr>
 
-        <!-- Bulk Generate -->
         <div class="section-title">
             Bulk Generate <span class="badge">New</span>
         </div>
         <form method="POST" action="{{ route('bulk.generate') }}">
             @csrf
-            <textarea name="emails" rows="2" placeholder=""></textarea>
+            <textarea name="emails" rows="2" placeholder="Enter multiple emails separated by commas or new lines"></textarea>
             <div class="row" style="margin-top: 12px;">
                 <div>
                     <select name="bulk_size">
                         <option value="80">80px</option>
                         <option value="200" selected>200px</option>
                         <option value="300">300px</option>
+                    </select>
+                </div>
+                <div>
+                    <select name="bulk_rating">
+                        <option value="g" selected>G</option>
+                        <option value="pg">PG</option>
+                        <option value="r">R</option>
+                        <option value="x">X</option>
+                    </select>
+                </div>
+                <div>
+                    <select name="bulk_default_image">
+                        <option value="identicon" selected>Identicon</option>
+                        <option value="monsterid">MonsterID</option>
+                        <option value="wavatar">Wavatar</option>
+                        <option value="retro">Retro</option>
+                        <option value="robohash">RoboHash</option>
+                        <option value="mp">Mystery Person</option>
+                        <option value="blank">Blank</option>
                     </select>
                 </div>
                 <div>
@@ -455,17 +576,15 @@
 
         <hr>
 
-        <!-- Actions -->
         <div class="action-bar">
             <a href="{{ route('export.csv') }}" style="text-decoration: none;">
                 <button type="button" class="btn-secondary">Export CSV</button>
             </a>
-            <button type="button" onclick="showClearModal()" class="btn-danger"> Clear All</button>
+            <button type="button" onclick="showClearModal()" class="btn-danger">Clear All</button>
         </div>
 
-        <!-- Avatar List -->
         <div class="section-title">
-             Saved Avatars ({{ $avatars->count() }})
+            Saved Avatars ({{ $totalCount }})
         </div>
 
         @if($avatars->isEmpty())
@@ -482,13 +601,34 @@
                     <div class="avatar-info">
                         <img src="{{ $avatar->avatar }}" alt="avatar">
                         <div>
-                            <div class="avatar-email">{{ $avatar->email }}</div>
-                            <div class="avatar-date">{{ $avatar->created_at->diffForHumans() }}</div>
+                            <div class="avatar-email">
+                                {{ $avatar->email }}
+                                @if($avatar->has_real_gravatar)
+                                    <span class="badge" style="background:#d1fae5;color:#059669;">Real Photo</span>
+                                @else
+                                    <span class="badge">Default</span>
+                                @endif
+                            </div>
+                            <div class="avatar-date">{{ $avatar->created_at->diffForHumans() }} • {{ strtoupper($avatar->rating) }} • {{ $avatar->size }}px</div>
                         </div>
                     </div>
                     <div class="avatar-actions">
+                        <form method="POST" action="{{ route('favorite.avatar', $avatar->id) }}">
+                            @csrf
+                            @method('PATCH')
+                            <button type="submit" class="btn-sm" style="background: {{ $avatar->is_favorite ? '#fbbf24' : '#f3f4f6' }}; color: {{ $avatar->is_favorite ? 'white' : '#374151' }};">{{ $avatar->is_favorite ? '★' : '☆' }}</button>
+                        </form>
+                        <button class="btn-secondary btn-sm" onclick="openEditModal({{ $avatar->id }}, '{{ $avatar->email }}', {{ $avatar->size }}, '{{ $avatar->rating }}', '{{ $avatar->default_image }}')">Edit</button>
                         <button class="btn-secondary btn-sm" onclick="copyEmail('{{ $avatar->email }}')">Copy</button>
-                        <form method="POST" action="{{ route('delete.avatar', $avatar->id) }}" style="display: inline;">
+                        <button class="btn-secondary btn-sm" onclick="copyUrl('{{ $avatar->avatar }}')">Link</button>
+                        <a href="{{ $avatar->avatar }}" download target="_blank" style="text-decoration:none;">
+                            <button type="button" class="btn-secondary btn-sm">Download</button>
+                        </a>
+                        <form method="POST" action="{{ route('refresh.cache', $avatar->id) }}">
+                            @csrf
+                            <button type="submit" class="btn-secondary btn-sm">Refresh</button>
+                        </form>
+                        <form method="POST" action="{{ route('delete.avatar', $avatar->id) }}">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="btn-danger btn-sm">Delete</button>
@@ -497,17 +637,34 @@
                 </div>
             @endforeach
         </div>
+
+        @if($avatars->hasPages())
+            <div class="pagination-wrap">
+                @if($avatars->onFirstPage())
+                    <span class="page-btn disabled">‹ Prev</span>
+                @else
+                    <a href="{{ $avatars->previousPageUrl() }}" class="page-btn">‹ Prev</a>
+                @endif
+
+                <span class="page-info">Page {{ $avatars->currentPage() }} of {{ $avatars->lastPage() }}</span>
+
+                @if($avatars->hasMorePages())
+                    <a href="{{ $avatars->nextPageUrl() }}" class="page-btn">Next ›</a>
+                @else
+                    <span class="page-btn disabled">Next ›</span>
+                @endif
+            </div>
+        @endif
     </div>
 </div>
 
-<!-- Clear All Modal -->
 <div id="clearModal" class="modal">
     <div class="modal-content">
         <h3>Delete All Avatars?</h3>
-        <p>This will permanently delete all {{ $avatars->count() }} avatar(s). This action cannot be undone.</p>
+        <p>This will permanently delete all {{ $totalCount }} avatar(s). This action cannot be undone.</p>
         <div class="modal-buttons">
             <button onclick="closeModal()" class="btn-secondary">Cancel</button>
-            <form method="POST" action="{{ route('clear.all') }}" style="display: inline;">
+            <form method="POST" action="{{ route('clear.all') }}">
                 @csrf
                 @method('DELETE')
                 <button type="submit" class="btn-danger">Delete All</button>
@@ -516,106 +673,200 @@
     </div>
 </div>
 
+<div id="editModal" class="modal">
+    <div class="modal-content">
+        <h3>Edit Avatar Settings</h3>
+        <form method="POST" id="editForm">
+            @csrf
+            @method('PATCH')
+            <div class="form-group" style="text-align:left;">
+                <label>Email</label>
+                <input type="text" id="editEmailDisplay" disabled>
+            </div>
+            <div class="form-group" style="text-align:left;">
+                <label>Size</label>
+                <select name="size" id="editSize">
+                    <option value="80">80px</option>
+                    <option value="200">200px</option>
+                    <option value="300">300px</option>
+                </select>
+            </div>
+            <div class="form-group" style="text-align:left;">
+                <label>Rating</label>
+                <select name="rating" id="editRating">
+                    <option value="g">G - General</option>
+                    <option value="pg">PG - Parental Guidance</option>
+                    <option value="r">R - Restricted</option>
+                    <option value="x">X - Explicit</option>
+                </select>
+            </div>
+            <div class="form-group" style="text-align:left;">
+                <label>Default Image</label>
+                <select name="default_image" id="editDefaultImage">
+                    <option value="identicon">Identicon</option>
+                    <option value="monsterid">MonsterID</option>
+                    <option value="wavatar">Wavatar</option>
+                    <option value="retro">Retro</option>
+                    <option value="robohash">RoboHash</option>
+                    <option value="mp">Mystery Person</option>
+                    <option value="blank">Blank</option>
+                </select>
+            </div>
+            <div class="modal-buttons">
+                <button type="button" onclick="closeEditModal()" class="btn-secondary">Cancel</button>
+                <button type="submit">Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <script>
-    // Live Preview
     const emailInput = document.getElementById('emailInput');
+    const sizeSelect = document.getElementById('sizeSelect');
+    const ratingSelect = document.getElementById('ratingSelect');
+    const defaultImageSelect = document.getElementById('defaultImageSelect');
     const previewBox = document.getElementById('previewBox');
     const previewImg = document.getElementById('previewImg');
     const previewEmailSpan = document.getElementById('previewEmail');
     const previewStatusSpan = document.getElementById('previewStatus');
     const previewBtn = document.getElementById('previewBtn');
-    
+
     let previewTimeout;
-    
-    emailInput.addEventListener('input', function() {
+
+    function triggerPreview() {
         clearTimeout(previewTimeout);
-        const email = this.value.trim();
-        
+        const email = emailInput.value.trim();
+
         if (email && email.includes('@')) {
             previewTimeout = setTimeout(() => fetchPreview(email), 400);
         } else {
             previewBox.style.display = 'none';
         }
-    });
-    
+    }
+
+    emailInput.addEventListener('input', triggerPreview);
+    sizeSelect.addEventListener('change', triggerPreview);
+    ratingSelect.addEventListener('change', triggerPreview);
+    defaultImageSelect.addEventListener('change', triggerPreview);
+
     function fetchPreview(email) {
-        const size = document.querySelector('select[name="size"]').value;
-        
         fetch('{{ route("preview.avatar") }}', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
             },
-            body: JSON.stringify({ preview_email: email, preview_size: size })
+            body: JSON.stringify({
+                preview_email: email,
+                preview_size: sizeSelect.value,
+                preview_rating: ratingSelect.value,
+                preview_default_image: defaultImageSelect.value
+            })
         })
         .then(response => response.json())
         .then(data => {
             previewImg.src = data.avatar_url;
             previewEmailSpan.textContent = data.email;
-            
+
+            let statusParts = [];
+
             if (data.exists) {
-                previewStatusSpan.textContent = 'Already exists';
-                previewStatusSpan.style.color = '#ef4444';
+                statusParts.push('Already saved');
                 previewBtn.style.display = 'none';
             } else {
-                previewStatusSpan.textContent = '✓ Ready to generate';
-                previewStatusSpan.style.color = '#10b981';
+                statusParts.push('Ready to generate');
                 previewBtn.style.display = 'inline-block';
             }
-            
+
+            statusParts.push(data.is_real_gravatar ? 'Real photo found' : 'No real photo, using default');
+
+            previewStatusSpan.textContent = statusParts.join(' • ');
+            previewStatusSpan.style.color = data.exists ? '#ef4444' : '#10b981';
+
             previewBox.style.display = 'flex';
-            
+
             previewBtn.onclick = function() {
                 const form = document.getElementById('singleForm');
-                const hiddenInput = document.createElement('input');
-                hiddenInput.type = 'hidden';
-                hiddenInput.name = 'email';
-                hiddenInput.value = email;
-                form.appendChild(hiddenInput);
+                const hiddenEmail = document.createElement('input');
+                hiddenEmail.type = 'hidden';
+                hiddenEmail.name = 'email';
+                hiddenEmail.value = email;
+                form.appendChild(hiddenEmail);
                 form.submit();
             };
         })
         .catch(() => {});
     }
-    
-    // Copy email
+
     function copyEmail(email) {
         navigator.clipboard.writeText(email).then(() => {
-            const toast = document.createElement('div');
-            toast.textContent = '✓ Copied: ' + email;
-            toast.style.cssText = `
-                position: fixed;
-                bottom: 20px;
-                right: 20px;
-                background: #1f2937;
-                color: white;
-                padding: 8px 16px;
-                border-radius: 10px;
-                font-size: 13px;
-                z-index: 1000;
-                animation: fadeOut 1.5s forwards;
-            `;
-            document.body.appendChild(toast);
-            setTimeout(() => toast.remove(), 1500);
+            showToast('Copied: ' + email);
         });
     }
-    
-    // Modal
+
+    function copyUrl(url) {
+        navigator.clipboard.writeText(url).then(() => {
+            showToast('Copied avatar URL');
+        });
+    }
+
+    function showToast(message) {
+        const toast = document.createElement('div');
+        toast.textContent = '✓ ' + message;
+        toast.style.cssText = `
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #1f2937;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 10px;
+            font-size: 13px;
+            z-index: 1000;
+            animation: fadeOut 1.5s forwards;
+        `;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 1500);
+    }
+
     function showClearModal() {
         document.getElementById('clearModal').classList.add('active');
     }
-    
+
     function closeModal() {
         document.getElementById('clearModal').classList.remove('active');
     }
-    
-    window.onclick = function(event) {
-        const modal = document.getElementById('clearModal');
-        if (event.target === modal) closeModal();
+
+    function openEditModal(id, email, size, rating, defaultImage) {
+        document.getElementById('editForm').action = '/avatar/' + id;
+        document.getElementById('editEmailDisplay').value = email;
+        document.getElementById('editSize').value = size;
+        document.getElementById('editRating').value = rating;
+        document.getElementById('editDefaultImage').value = defaultImage;
+        document.getElementById('editModal').classList.add('active');
     }
-    
-    // Animation
+
+    function closeEditModal() {
+        document.getElementById('editModal').classList.remove('active');
+    }
+
+    window.onclick = function(event) {
+        const clearModal = document.getElementById('clearModal');
+        const editModal = document.getElementById('editModal');
+        if (event.target === clearModal) closeModal();
+        if (event.target === editModal) closeEditModal();
+    }
+
+    fetch('{{ route("avatar.stats") }}')
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('statTotal').textContent = data.total;
+            document.getElementById('statReal').textContent = data.real_gravatars;
+            document.getElementById('statFavorites').textContent = data.favorites;
+            document.getElementById('statRecent').textContent = data.recent_7_days;
+        })
+        .catch(() => {});
+
     const style = document.createElement('style');
     style.textContent = `@keyframes fadeOut { 0% { opacity: 1; } 70% { opacity: 1; } 100% { opacity: 0; visibility: hidden; } }`;
     document.head.appendChild(style);
