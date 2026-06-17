@@ -12,10 +12,24 @@ class Gravatar extends Model
     protected $fillable = [
         'email',
         'avatar',
-        'size'
+        'size',
+        'rating',
+        'default_image',
+        'is_favorite',
+        'has_real_gravatar',
+        'gravatar_checked_at'
+    ];
+
+    protected $casts = [
+        'is_favorite' => 'boolean',
+        'has_real_gravatar' => 'boolean',
+        'gravatar_checked_at' => 'datetime'
     ];
 
     protected $attributes = [
-        'size' => 200
+        'size' => 200,
+        'rating' => 'g',
+        'default_image' => 'identicon',
+        'is_favorite' => false
     ];
 }
